@@ -1435,8 +1435,12 @@ class HesabatApp(MDApp):
     # ---- حوار إدخال نصّي (للشُّعب) ----
     def text_dialog(self, title, hint, text="", on_ok=None):
         field = ArabicInput(hint_text=ar(hint), text=text)
+        box = MDBoxLayout(
+            orientation="vertical", size_hint_y=None, height=dp(72),
+            padding=(0, dp(6)))
+        box.add_widget(field)
         dlg = MDDialog(
-            title=ar(title), type="custom", content_cls=field,
+            title=ar(title), type="custom", content_cls=box,
             buttons=[
                 MDFlatButton(text=ar("إلغاء"), on_release=lambda x: dlg.dismiss()),
                 MDRaisedButton(
