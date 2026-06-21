@@ -41,7 +41,9 @@ jobs:
 
       - name: Build APK (debug)
         run: |
-          export PATH=$PATH:~/.local/bin
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$HOME/.local/bin:$PATH
+          java -version
           yes | buildozer android debug
 
       - name: Upload APK artifact
