@@ -21,7 +21,7 @@ version = 1.0
 # الاعتماديات — لا تغيّر إصدار kivymd لتفادي مشاكل البناء
 # python-bidi مثبّت على 0.4.2 (نقي بايثون) لأن الإصدارات الأحدث تعتمد على Rust ولا تُبنى
 requirements = python3,kivy==2.3.0,kivymd==1.1.1,arabic_reshaper,python-bidi==0.4.2,sqlite3,openpyxl,et_xmlfile,plyer,pyjnius
-
+p4a.branch = 2024.1.21
 # تثبيت python-for-android على إصدار مستقر يبني بايثون 3.11
 # (الإصدار الأحدث/master يبني بايثون 3.14 الذي لا يتوافق مع Kivy 2.3.0)
 p4a.branch = 2024.1.21
