@@ -46,6 +46,7 @@ from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.uix.textfield import MDTextField
+from kivy.uix.textinput import TextInput
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.selectioncontrol import MDCheckbox
@@ -237,15 +238,28 @@ def _download_dirs():
 # فتظهر الحروف متّصلة وغير معكوسة أثناء الكتابة.
 # عند الحفظ تُقرأ القيمة من real_text وليس text.
 # ----------------------------------------------------------------------
-class ArabicInput(MDTextField):
+class ArabicInput(TextInput):
+    """حقل كتابة عربي مستقر (مبني على TextInput البسيط بدل MDTextField)."""
     real_text = StringProperty("")
 
     def __init__(self, **kwargs):
         initial = kwargs.pop("text", "")
+        kwargs.setdefault("multiline", False)
+        kwargs.setdefault("size_hint_y", None)
+        kwargs.setdefault("height", dp(50))
+        kwargs.setdefault("halign", "right")
+        kwargs.setdefault("padding", [dp(12), dp(13), dp(12), dp(13)])
+        kwargs.setdefault("background_color", (0.96, 0.96, 0.985, 1))
+        kwargs.setdefault("foreground_color", (0.12, 0.14, 0.21, 1))
+        kwargs.setdefault("hint_text_color", (0.6, 0.62, 0.68, 1))
+        kwargs.setdefault("cursor_color", C_PRIMARY)
         super().__init__(**kwargs)
-        self.halign = "right"
         if APP_FONT:
-            self.font_name = APP_FONT
+            try:
+                self.font_name = APP_FONT
+            except Exception:
+                pass
+        self.font_size = dp(18)
         if initial:
             self.real_text = initial
             self._render()
@@ -259,12 +273,31 @@ class ArabicInput(MDTextField):
         self._render()
 
     def _render(self):
-        # نعرض النص مُشكّلًا دون المرور بـ insert_text (لا تكرار)
         self.text = ar(self.real_text) if self.real_text else ""
         try:
             self.cursor = (len(self.text), 0)
         except Exception:
             pass
+
+
+class NumInput(TextInput):
+    """حقل أرقام بسيط ومستقر."""
+    def __init__(self, **kwargs):
+        kwargs.setdefault("multiline", False)
+        kwargs.setdefault("size_hint_y", None)
+        kwargs.setdefault("height", dp(50))
+        kwargs.setdefault("padding", [dp(12), dp(13), dp(12), dp(13)])
+        kwargs.setdefault("background_color", (0.96, 0.96, 0.985, 1))
+        kwargs.setdefault("foreground_color", (0.12, 0.14, 0.21, 1))
+        kwargs.setdefault("hint_text_color", (0.6, 0.62, 0.68, 1))
+        kwargs.setdefault("cursor_color", C_PRIMARY)
+        super().__init__(**kwargs)
+        if APP_FONT:
+            try:
+                self.font_name = APP_FONT
+            except Exception:
+                pass
+        self.font_size = dp(18)
 
 
 # ----------------------------------------------------------------------
@@ -1411,6 +1444,10 @@ class HesabatApp(MDApp):
         self.theme_cls.material_style = "M2"
         Window.clearcolor = C_BG
         try:
+            Window.softinput_mode = "below_target"
+        except Exception:
+            pass
+        try:
             from android.permissions import request_permissions, Permission
             request_permissions([Permission.WRITE_EXTERNAL_STORAGE,
                                  Permission.READ_EXTERNAL_STORAGE])
@@ -1453,15 +1490,15 @@ class HesabatApp(MDApp):
     # ---- حوار إضافة/تعديل فرد (اسم + هاتف + ماستر كارد) ----
     def member_dialog(self, title, name="", phone="", mastercard="", on_ok=None):
         name_field = ArabicInput(hint_text=ar("اسم الفرد"), text=name)
-        phone_field = MDTextField(
+        phone_field = NumInput(
             hint_text=ar("رقم الهاتف"), text=phone,
             halign="left", input_filter=phone_filter)
-        mc_field = MDTextField(
+        mc_field = NumInput(
             hint_text=ar("ماستر كارد"), text=mastercard,
             halign="left", input_filter=phone_filter)
         box = MDBoxLayout(
-            orientation="vertical", spacing=dp(8),
-            size_hint_y=None, height=dp(210))
+            orientation="vertical", spacing=dp(12),
+            size_hint_y=None, height=dp(186))
         box.add_widget(name_field)
         box.add_widget(phone_field)
         box.add_widget(mc_field)
@@ -1485,15 +1522,15 @@ class HesabatApp(MDApp):
 
     # ---- حوار مبالغ الشعبة (الأصلي + التبرع) ----
     def division_amounts_dialog(self, base=0, donation=0, on_ok=None):
-        base_field = MDTextField(
+        base_field = NumInput(
             hint_text=ar("المبلغ الأصلي"), text=_numstr(base),
             input_filter="float", halign="right")
-        dona_field = MDTextField(
+        dona_field = NumInput(
             hint_text=ar("مبلغ التبرع"), text=_numstr(donation),
             input_filter="float", halign="right")
         box = MDBoxLayout(
-            orientation="vertical", spacing=dp(8),
-            size_hint_y=None, height=dp(150))
+            orientation="vertical", spacing=dp(12),
+            size_hint_y=None, height=dp(124))
         box.add_widget(base_field)
         box.add_widget(dona_field)
 
@@ -1519,12 +1556,12 @@ class HesabatApp(MDApp):
     # ---- حوار مبلغ + ملاحظة (مع خيار الخصم) ----
     def amount_dialog(self, title, on_ok=None, show_sign=False):
         deduct = {"v": False}
-        amount_field = MDTextField(
+        amount_field = NumInput(
             hint_text=ar("المبلغ"), input_filter="float", halign="right")
         note_field = ArabicInput(hint_text=ar("ملاحظة (اختياري)"))
         box = MDBoxLayout(
-            orientation="vertical", spacing=dp(8),
-            size_hint_y=None, height=dp(150))
+            orientation="vertical", spacing=dp(12),
+            size_hint_y=None, height=dp(124))
         box.add_widget(amount_field)
         box.add_widget(note_field)
 
@@ -1538,7 +1575,7 @@ class HesabatApp(MDApp):
             row.add_widget(cb)
             row.add_widget(lbl)
             box.add_widget(row)
-            box.height = dp(200)
+            box.height = dp(178)
 
         def _ok(*a):
             try:
