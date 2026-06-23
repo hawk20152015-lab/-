@@ -253,6 +253,8 @@ class ArabicInput(TextInput):
         kwargs.setdefault("foreground_color", (0.12, 0.14, 0.21, 1))
         kwargs.setdefault("hint_text_color", (0.6, 0.62, 0.68, 1))
         kwargs.setdefault("cursor_color", C_PRIMARY)
+        kwargs.setdefault("keyboard_suggestions", False)
+        kwargs.setdefault("write_tab", False)
         super().__init__(**kwargs)
         if APP_FONT:
             try:
@@ -291,6 +293,9 @@ class NumInput(TextInput):
         kwargs.setdefault("foreground_color", (0.12, 0.14, 0.21, 1))
         kwargs.setdefault("hint_text_color", (0.6, 0.62, 0.68, 1))
         kwargs.setdefault("cursor_color", C_PRIMARY)
+        kwargs.setdefault("keyboard_suggestions", False)
+        kwargs.setdefault("write_tab", False)
+        kwargs.setdefault("input_type", "number")
         super().__init__(**kwargs)
         if APP_FONT:
             try:

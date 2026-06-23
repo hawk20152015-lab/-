@@ -44,7 +44,7 @@ warn_on_root = 1
 android.permissions = WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
 
 # مستويات الـ API
-android.api = 33
+android.api = 34
 android.minapi = 21
 android.ndk = 25b
 
